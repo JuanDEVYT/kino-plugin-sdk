@@ -407,6 +407,26 @@ Estos números traen API de **Kino 0.9.81, que aún no se publica**; todo Kino a
   moverlo; Kino ignora cada campo inválido y mantiene el texto legible. El reloj de ejemplo los ofrece como ajustes, con la zona horaria
   como un desfase fijo respecto de UTC (no sigue el horario de verano).
 
+## apiVersion 24 to 26 (Kino 0.9.85, 0.9.86 and the next Kino, 0.9.87 provisionally) / apiVersion 24 a 26 (Kino 0.9.85, 0.9.86 y la próxima versión, la 0.9.87 provisionalmente)
+
+- **apiVersion 24 (Kino 0.9.85):** a stream's `drm` may be a list of options (best first) and a block may be `type: "clearkey"` with its `keys`;
+  `validate.mjs --run resolve` prints the options in the order a phone would try them. / El `drm` de un stream puede ser una lista de opciones
+  (la mejor primero) y un bloque puede ser `type: "clearkey"` con sus `keys`.
+- **apiVersion 25 (Kino 0.9.86):** a stream's `subtitles` entry may carry its own decrypted `text` (with `format` `vtt` or `srt`) instead of a `url`. /
+  Una entrada `subtitles` puede llevar su propio `text` descifrado.
+- **apiVersion 26, app themes that paint (not published yet):** `appThemes` may declare `surfaces` (fill, stroke and glow per element), `style.gloss`,
+  `layout` (a framed hero and a floating rail, TV only), `assets` (a picture and a font from your own repository, hash-checked at install),
+  `background.image`, `typography.fontFamily`, and the tokens `shape.heroRadius` and `shape.railItemRadius`. `validate.mjs` checks the **format** of
+  these keys with the app's rules (`sdk/appthemes.mjs`); it does not yet replay the app's contrast and range warnings for them, so look at the theme
+  in Kino. A complete example: <https://github.com/kinotvapp/kino-plugin-theme-crimson>. Guide:
+  <https://kinotvapp.github.io/kino-plugins/en/themes/#level2>. / Los temas pueden pintar: `surfaces`, `style.gloss`, `layout`, `assets`,
+  `background.image`, `typography.fontFamily`. `validate.mjs` revisa el **formato** con las reglas de la app, pero todavía no repite sus avisos de
+  contraste y de rangos: mira el tema en Kino.
+- **`kino.visualBrowser` and `localStorage` (additive inside apiVersion 20, next Kino):** `collect.localStorage: [keys]` and `doneWhen.localStorage: [keys]`
+  read only the named keys of the page the window ends on (the `visualBrowser` option of `createKino` plays the person: answer
+  `{ status: "done", localStorage: { token: "…" } }`); an older Kino ignores them and answers no `localStorage`. Guide:
+  <https://kinotvapp.github.io/kino-plugins/en/visual-browser/#rules>. / Lee solo las claves nombradas del `localStorage` de la página donde termina la ventana.
+
 ## Tests
 
 ```
