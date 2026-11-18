@@ -473,8 +473,8 @@ The guide: <https://kinotvapp.github.io/kino-plugins/en/share/>, <https://kinotv
   the sliding HLS window itself on its own local proxy: `template` (each segment's address, with the required `{seg}` and an
   optional `{mc}` that `mediaCode` fills), `grid` (the repeating segment durations, in ms), `anchor` (`{ t, s, firstStep? }`, one
   real segment) and the tuning knobs `rate`, `window`, `reanchor` and `segWidth` (clamped, never refused). Next to it Kino ignores
-  the stream's `url`, and also `drm`, `signing`, `external`, `alternatives`, `audioTracks`, `durationMs`, `skip` and
-  `expiresInSeconds`. Each segment address passes a live channel's host rule (a declared host, `liveStreamHosts: "any"` or
+  the stream's `url`, and also `alternatives`, `audioTracks`, `durationMs`, `skip` and `expiresInSeconds`; a `drm`, `signing` or
+  `external` beside it refuses the stream. Each segment address passes a live channel's host rule (a declared host, `liveStreamHosts: "any"` or
   `streamHosts: "any"`; http only where a channel's own `url` may be http, never the home network). No plugin call runs while it plays. The kit
   does not build that window: see "Where it differs from the app" above.
 - **Keep your base `apiVersion`:** Kino reads `clockLive` from your plugin's feature apiVersion, so keep the base you need and add
@@ -488,7 +488,9 @@ The guide: <https://kinotvapp.github.io/kino-plugins/en/share/>, <https://kinotv
   player starts from that answer if the person presses play within 20 minutes, or before 60 s are left of its `expiresInSeconds`
   when that comes first.
   Kino checks its hosts as it checks the player's own `resolve`, and does not keep an answer that would need the person to approve
-  a host. Declare it only if a `resolve` nobody plays has no effect the person would notice: no play counted, no quota or trial
+  a host. It resolves ahead only for a plugin whose `resolve` can ask the person nothing: an approved `"fetchHosts": "any"`, video
+  from any server (an approved `"streamHosts": "any"` or the broad video permission) and no `externalResolve`; for any other
+  plugin the field does nothing, and Kino does not call `prepare` instead (the kit does not check those approvals). Declare it only if a `resolve` nobody plays has no effect the person would notice: no play counted, no quota or trial
   spent, no hidden page. Kino ignores it next to `catalogOnly` and `browser`, and drops a value that is not a boolean;
   `validate.mjs` warns about both and notes what `true` means.
 - **The optional export `prepare(ref)` (at any apiVersion, with `resolve`):** for a plugin whose `resolve` must not run for titles
@@ -519,8 +521,8 @@ The guide: <https://kinotvapp.github.io/kino-plugins/en/live-channels/>, <https:
   arma él mismo la ventana HLS en su proxy local: `template` (la dirección de cada segmento, con `{seg}` obligatorio y un `{mc}`
   opcional que llena `mediaCode`), `grid` (las duraciones de los segmentos en ms, que se repiten), `anchor` (`{ t, s, firstStep? }`,
   un segmento real) y los ajustes `rate`, `window`, `reanchor` y `segWidth` (se acotan, nunca rechazan). Junto a él, Kino ignora el
-  `url` del stream y también `drm`, `signing`, `external`, `alternatives`, `audioTracks`, `durationMs`, `skip` y
-  `expiresInSeconds`; cada dirección de segmento pasa la regla de hosts de un canal en vivo (un host declarado,
+  `url` del stream y también `alternatives`, `audioTracks`, `durationMs`, `skip` y `expiresInSeconds`; un `drm`, un `signing` o un
+  `external` a su lado rechazan el stream. Cada dirección de segmento pasa la regla de hosts de un canal en vivo (un host declarado,
   `liveStreamHosts: "any"` o `streamHosts: "any"`; http solo donde la `url` de un canal puede ser http, nunca la red de la casa). Mientras se
   reproduce no se llama al plugin. El kit no arma esa ventana: lee «Dónde difiere de la app», más arriba.
 - **Conserva tu `apiVersion` base:** Kino lee `clockLive` del apiVersion efectivo de tu plugin, así que conserva la base que
@@ -534,7 +536,10 @@ The guide: <https://kinotvapp.github.io/kino-plugins/en/live-channels/>, <https:
   uno de tus títulos, Kino puede llamar a tu `resolve` en segundo plano para lo que iniciaría su botón de reproducir (una película o
   un episodio), y el reproductor arranca con esa respuesta si la persona presiona reproducir dentro de 20 minutos, o antes de que
   falten 60 s para que venza su `expiresInSeconds`, lo que ocurra primero. Kino revisa sus hosts como en el `resolve` del
-  reproductor y no guarda una respuesta que necesitaría que la persona apruebe un host. Decláralo solo si un `resolve` que nadie reproduce no tiene ningún efecto que la
+  reproductor y no guarda una respuesta que necesitaría que la persona apruebe un host. Solo resuelve por adelantado un plugin cuyo
+  `resolve` no puede preguntarle nada a la persona: un `"fetchHosts": "any"` aprobado, video desde cualquier servidor (un
+  `"streamHosts": "any"` aprobado o el permiso de video amplio) y sin `externalResolve`; en cualquier otro plugin el campo no hace
+  nada, y Kino tampoco llama a `prepare` en su lugar (el kit no revisa esas aprobaciones). Decláralo solo si un `resolve` que nadie reproduce no tiene ningún efecto que la
   persona note: no cuenta una reproducción, no gasta una cuota ni una prueba, no abre una página oculta. Kino lo ignora junto a
   `catalogOnly` y `browser`, y descarta un valor que no sea booleano; `validate.mjs` avisa de los dos casos y explica qué significa
   `true`.
