@@ -475,7 +475,7 @@ The guide: <https://kinotvapp.github.io/kino-plugins/en/share/>, <https://kinotv
   real segment) and the tuning knobs `rate`, `window`, `reanchor` and `segWidth` (clamped, never refused). Next to it Kino ignores
   the stream's `url`, and also `drm`, `signing`, `external`, `alternatives`, `audioTracks`, `durationMs`, `skip` and
   `expiresInSeconds`. Each segment address passes a live channel's host rule (a declared host, `liveStreamHosts: "any"` or
-  `streamHosts: "any"`; http is allowed for a live channel, never the home network). No plugin call runs while it plays. The kit
+  `streamHosts: "any"`; http only where a channel's own `url` may be http, never the home network). No plugin call runs while it plays. The kit
   does not build that window: see "Where it differs from the app" above.
 - **Keep your base `apiVersion`:** Kino reads `clockLive` from your plugin's feature apiVersion, so keep the base you need and add
   `"enhancements": { "27": {} }`. Send `clockLive` only when `typeof kino.pluginApiVersion === "number" && kino.pluginApiVersion >= 27`,
@@ -521,7 +521,7 @@ The guide: <https://kinotvapp.github.io/kino-plugins/en/live-channels/>, <https:
   un segmento real) y los ajustes `rate`, `window`, `reanchor` y `segWidth` (se acotan, nunca rechazan). Junto a él, Kino ignora el
   `url` del stream y también `drm`, `signing`, `external`, `alternatives`, `audioTracks`, `durationMs`, `skip` y
   `expiresInSeconds`; cada dirección de segmento pasa la regla de hosts de un canal en vivo (un host declarado,
-  `liveStreamHosts: "any"` o `streamHosts: "any"`; http se permite en un canal en vivo, nunca la red de la casa). Mientras se
+  `liveStreamHosts: "any"` o `streamHosts: "any"`; http solo donde la `url` de un canal puede ser http, nunca la red de la casa). Mientras se
   reproduce no se llama al plugin. El kit no arma esa ventana: lee «Dónde difiere de la app», más arriba.
 - **Conserva tu `apiVersion` base:** Kino lee `clockLive` del apiVersion efectivo de tu plugin, así que conserva la base que
   necesitas y agrega `"enhancements": { "27": {} }`. Envía `clockLive` solo cuando
