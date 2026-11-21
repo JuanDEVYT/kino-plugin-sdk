@@ -2617,7 +2617,7 @@ class Reader {
     return { [op]: k };
   }
 
-  /** Exactly one of the thirteen go shapes, logged under [where] when it is not. */
+  /** Exactly one of the go shapes, logged under [where] when it is not. */
   goOf(o, where) {
     const keys = Object.keys(o);
     const k = keys.length === 1 && GO_KEYS.includes(keys[0]) ? keys[0] : null;
@@ -2668,7 +2668,7 @@ class Reader {
       const g = pluginGoOf(v, (why) => this.log(`${where} go.plugin ${why}, dropped`));
       return g === null ? null : { plugin: g };
     }
-    if (k === "section" || k === "categories" || k === "close" || k === "syncProvider") return v === true ? { [k]: true } : bad("must be true");
+    if (k === "section" || k === "categories" || k === "close" || k === "syncProvider" || k === "searchScreen") return v === true ? { [k]: true } : bad("must be true");
     if (!isObj(v)) return bad("is not an object");
     if (k === "search") {
       const q = (typeof opt(v, "q") === "string" ? v.q : "").trim();

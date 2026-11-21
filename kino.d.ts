@@ -2915,7 +2915,12 @@ interface KinoBrowserCaptureOptions {
   /**
    * Kino 0.9.54: a cookie name (an HTTP token, e.g. `"cf_clearance"`) the page must also hold for its current host.
    * Without `match` no request is needed: the page ends as soon as the cookie is there (a cookie-only page). Kino never
-   * autoplays or taps a page that waits for a cookie. With `captureAll` it needs a `match`.
+   * autoplays or taps a page that waits for a cookie. With `captureAll` it needs a `match`. A capture with
+   * `waitForCookie` WAITS THROUGH an auto-clearing challenge (Cloudflare's managed check) instead of ending at once on
+   * its human-check widget: it keeps polling for the cookie (and any matching media) until the cookie is there or the
+   * timeout runs out, so a challenge that clears by itself lets the stream through. A real captcha that needs a person
+   * never clears on its own, so the capture simply times out (a plain `kino.browser.capture` without `waitForCookie`
+   * still ends at once with `blocked` on a human check).
    */
   waitForCookie?: string;
   /** Kino 0.9.54: a page that runs out of time answers what it had, with `timedOut: true`, instead of throwing `timeout`. */
@@ -3771,6 +3776,23 @@ declare namespace kino {
    */
   namespace identity {
     function telegram(options?: KinoIdentityOptions): Promise<KinoIdentity>;
+  }
+
+  /**
+   * apiVersion 28, capability "vault" (requires "identity", so it rides on identity's red consent line): read your plugin's OWN
+   * sealed secret from the Kino secrets vault with `kino.vault.get()`. Kino runs the whole exchange from inside — it mints a
+   * challenge, attests your plugin exactly as `kino.identity` does (a per-plugin pseudonym, a device-key signature, your author
+   * fingerprint and code hash, and the gate token for a trusted author so the vault can verify group membership live) and reads
+   * the secret the vault resolves for YOUR `(pluginId, author)`. You never see the vault's address, the challenge nor the scope
+   * the vault resolves by, so you can only ever read your own secret. The answer is whatever JSON you registered as the secret.
+   * Only inside a call the person started from `screen`, `screenEvent` or `panelAction` (never a timer tick, a job, Home or
+   * search), 6 a minute. Rejects with a KinoError whose `code` is `permission_denied`, `not_member` (not in the Kino group, or
+   * the plugin's scope does not match), `not_found` (no secret registered for this plugin), `rate_limited`, `unavailable` or
+   * `not_available` (this device has no Telegram validation, or the secrets service could not be reached). Present on every
+   * apiVersion 28 runtime: feature-detect with `typeof kino.vault === "object"`.
+   */
+  namespace vault {
+    function get(): Promise<any>;
   }
 
   /**

@@ -495,7 +495,21 @@ export async function validate(dirArg, { run = null, args = [], config = {}, rep
       if (gone.length) notes.push(`enhancements.${k}: "settings" leaves out ${gone.join(", ")}: a Kino that reads the enhancement has no such setting, an older one does (their values sync by key); keep the list a superset of the manifest's`);
       before = now;
     }
-    notes.push(`enhancements ${m.enhancementsApplied.join(", ")}: read by Kino ${contract.apiVersionFromApp[String(E.fromApiVersion)]} or later (capabilities: ${m.capabilities.join(", ")}); an older Kino ignores them and runs the plugin as apiVersion ${m.apiVersion}, so it must keep working without them there`);
+    // Each key is read by the Kino its own apiVersion first ships in (contract.json apiVersionFromApp), never earlier than the
+    // first Kino that reads enhancements at all (E.fromApiVersion): an older Kino ignores that key's block.
+    const readFrom = (k) => contract.apiVersionFromApp[String(Math.max(k, E.fromApiVersion))];
+    const groups = [];
+    for (const k of m.enhancementsApplied) {
+      const last = groups[groups.length - 1];
+      if (last && last.app === readFrom(k)) last.keys.push(k);
+      else groups.push({ app: readFrom(k), keys: [k] });
+    }
+    const keyList = (keys) => (keys.length > 1 ? `${keys.slice(0, -1).join(", ")} and ${keys[keys.length - 1]}` : String(keys[0]));
+    const readBy = groups.map((g, i) => `${groups.length > 1 ? `${keyList(g.keys)} ` : ""}${i === 0 ? "read " : ""}by Kino ${g.app} or later`).join(", ");
+    const older = groups.length > 1
+      ? `a Kino older than a key's release ignores that block, and one older than ${groups[0].app} ignores them all and runs the plugin as apiVersion ${m.apiVersion}`
+      : `an older Kino ignores them and runs the plugin as apiVersion ${m.apiVersion}`;
+    notes.push(`enhancements ${m.enhancementsApplied.join(", ")}: ${readBy} (capabilities: ${m.capabilities.join(", ")}); ${older}, so it must keep working without them there`);
   }
   if (!m.discoverable) notes.push("No aparecerá en la búsqueda de Kino");
   for (const note of catalogOnlyNotes(m)) notes.push(note);

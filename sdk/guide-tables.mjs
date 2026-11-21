@@ -66,6 +66,7 @@ const GO_TEXT = {
   title: "this plugin's title page (`ref`, `kind`; `id`, `title` and `adult` for a title that is not on the canvas)",
   play: "plays this plugin's title (`ref`, `kind`, as `title`)",
   search: `Kino's search with \`q\` (at most ${L.maxSearchQueryChars} characters), only this plugin as the source; with \`"scope": "all"\` (apiVersion 17; a lower plugin is refused, logged; any other scope drops the go) Kino's normal search on every source, which needs no \`search\` of yours and gives you nothing back: no results and no list of sources. The 18+ gate works as in Kino's search.`,
+  searchScreen: "Kino's own native search screen, empty: nothing typed and no source narrowed to, so the person searches from there; unlike `search` it carries no query (the «send me to search» button). Additive, no apiVersion; no capability needed",
   browse: "this plugin's \"Ver más\" list for a `ref`",
   section: "this plugin's section",
   categories: "Kino's Categorías with this plugin's group first (its own screen with `screen.replaces`)",

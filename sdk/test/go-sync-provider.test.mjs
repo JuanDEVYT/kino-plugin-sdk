@@ -12,10 +12,10 @@ const goOf = (go) => {
   return { go: r.answer?.go, dropped: r.dropped, log };
 };
 
-test("contract: syncProvider is the thirteenth shape and carries the rules", () => {
+test("contract: syncProvider is the fourteenth shape and carries the rules", () => {
   const shapes = contract.manifest.screen.goShapes;
-  assert.equal(shapes.length, 17); // useTheme, setExperience (apiVersion 18), installPlugin (apiVersion 19) and plugin (apiVersion 20) came after it
-  assert.equal(shapes[12], "syncProvider");
+  assert.equal(shapes.length, 18); // searchScreen (additive, no apiVersion) was inserted after search; useTheme, setExperience (apiVersion 18), installPlugin (apiVersion 19) and plugin (apiVersion 20) came after it
+  assert.equal(shapes[13], "syncProvider");
   const P = contract.manifest.screen.goSyncProvider;
   assert.equal(P.needsCapability, "syncProvider");
   assert.deepEqual(P.fromTriggers, ["press", "submit"]);

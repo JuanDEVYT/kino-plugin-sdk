@@ -8,8 +8,8 @@ const read = (v) => { const why = []; return { go: pluginGoOf(v, (w) => why.push
 const BAD_REPO = "repo must be a GitHub owner/name (a sub-path is allowed, a URL or an @ref is not), at most 200 characters";
 const BAD_ROUTE = "route must be 1 to 64 letters, digits or . _ ~ -";
 
-test("the contract lists the shape, from apiVersion 20, as the seventeenth", () => {
-  assert.equal(contract.manifest.screen.goShapes[16], "plugin");
+test("the contract lists the shape, from apiVersion 20, as the eighteenth", () => {
+  assert.equal(contract.manifest.screen.goShapes[17], "plugin");
   const P = contract.manifest.screen.goPlugin;
   assert.deepEqual(P.fields, ["repo", "route", "args", "query"]);
   assert.equal(P.maxRepoChars, 200);

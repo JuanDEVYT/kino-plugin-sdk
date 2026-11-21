@@ -2015,6 +2015,20 @@ export function createKino(manifest, { appVersion = "sdk", filesDir = null, lang
     },
   });
 
+  // --- kino.vault (apiVersion 28, capability "vault"): the plugin's own sealed secret. The real Kino runs the whole
+  // exchange and resolves it by (pluginId, author); the kit hands back a fake you set with KINO_VAULT_SECRET (the JSON
+  // secret) or makes get() throw KINO_VAULT_ERROR (a code like not_member, not_found or rate_limited). ---
+  const vaultApi = Object.freeze({
+    get: async () => {
+      await null;
+      const code = env.KINO_VAULT_ERROR;
+      if (code) { const e = new Error(`kino.vault.get: ${code}`); e.code = code; throw e; }
+      const raw = env.KINO_VAULT_SECRET;
+      if (raw === undefined || raw === "") return null;
+      try { return JSON.parse(raw); } catch { return raw; }
+    },
+  });
+
   // --- kino.ws (apiVersion 13, capability "socket"): the app's PluginWebSocket over Node's global WebSocket. wss:// only,
   // a host the manifest declares (never an IP literal or a local name, which cannot be declared), at most
   // contract.socket.maxSockets open, at most contract.socket.maxQueuedBytes queued unread (then `limit`). ---
@@ -2539,6 +2553,8 @@ export function createKino(manifest, { appVersion = "sdk", filesDir = null, lang
     ...(featureApiVersion(manifest) >= contract.kinoAi.apiVersion ? { ai: aiApi } : {}),
     // apiVersion 15 (contract.kinoIdentity): present on every apiVersion 15 kino, like the app's (typeof kino.identity === "object").
     ...(featureApiVersion(manifest) >= contract.kinoIdentity.apiVersion ? { identity: identityApi } : {}),
+    // apiVersion 28 (contract.kinoVault): present on every apiVersion 28 kino (typeof kino.vault === "object").
+    ...(featureApiVersion(manifest) >= contract.kinoVault.apiVersion ? { vault: vaultApi } : {}),
     // apiVersion 15 (contract.kinoNotifications): present on every apiVersion 15 kino (typeof kino.notifications === "object").
     ...(featureApiVersion(manifest) >= contract.kinoNotifications.apiVersion ? { notifications: Object.freeze({ post: notificationsApi.post, clear: notificationsApi.clear }) } : {}),
     // apiVersion 16 (contract.kinoCoins): present on every apiVersion 16 kino (typeof kino.coins === "object").

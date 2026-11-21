@@ -565,6 +565,43 @@ The guide: <https://kinotvapp.github.io/kino-plugins/en/live-channels/>, <https:
   `challenge`, la firma del aparato, pero nunca el `token` (`token` es opcional en `kino.d.ts`); Kino 0.9.87 y anteriores le
   responden `permission_denied`. El kit le da el token a cualquier autor, como una versión de depuración de Kino.
 
+## apiVersion 28 and Kino 0.9.90 / apiVersion 28 y Kino 0.9.90
+
+- **apiVersion 28, `vault` (declarative, needs `identity`, never alone):** `kino.vault.get()` answers your plugin's own sealed
+  secret from the Kino secrets vault. Kino runs the whole exchange from the inside — a challenge, the identity attestation (the
+  same machinery as `identity`: the per-plugin pseudonym, the device-key signature, your author fingerprint and `codeHash`, and,
+  for a `tokenAuthors` author, the gate token the vault checks group membership with live) and the read — and resolves the secret
+  by your `(pluginId, author)`. You never see the vault's address, the challenge nor the `pluginId`/`author` it resolves by, so a
+  plugin can only ever read ITS OWN secret, and a copy re-signed with another key resolves a different (missing) scope. Because
+  the read is gated by who the person is exactly as `identity` is, `vault` rides on `identity`'s consent and adds no approval of
+  its own — declare both capabilities. Only inside a call the person started (a screen, a screen event, a panel action), 6 a
+  minute; it rejects with `permission_denied`, `not_member`, `not_found`, `rate_limited`, `unavailable` or `not_available`. Cache
+  the secret yourself (`kino.storage`, ~1 h). The kit answers a fake: `KINO_VAULT_SECRET=<the JSON secret>`, or
+  `KINO_VAULT_ERROR=<code>` to make `get()` throw.
+- **`go: { searchScreen: true }` (additive, no apiVersion):** opens Kino's own native search screen, empty — nothing typed and no
+  source narrowed to, so the person searches from there. Unlike `go.search`, it carries no query (it is the "send me to search"
+  button) and needs no capability. An older Kino that does not know the key drops the whole go, the screen staying as it is.
+
+The guide: <https://kinotvapp.github.io/kino-plugins/en/vault/>, <https://kinotvapp.github.io/kino-plugins/en/identity/>,
+<https://kinotvapp.github.io/kino-plugins/en/screen-components/>.
+
+- **apiVersion 28, `vault` (declarativa, necesita `identity`, nunca sola):** `kino.vault.get()` devuelve el propio secreto sellado
+  de tu plugin desde la bóveda de secretos de Kino. Kino hace todo el intercambio por dentro —un desafío, la atestación de
+  identidad (la misma maquinaria de `identity`: el seudónimo por plugin, la firma con la llave del aparato, tu huella de autor y el
+  `codeHash`, y —para un autor de `tokenAuthors`— el token del gate con el que la bóveda verifica la membresía del grupo en vivo) y
+  la lectura— y resuelve el secreto por tu `(pluginId, author)`. Nunca ves la dirección de la bóveda, el desafío ni el
+  `pluginId`/`author` con el que resuelve, así que un plugin solo puede leer SU PROPIO secreto, y una copia re-firmada con otra
+  llave resuelve un ámbito distinto (inexistente). Como la lectura está gateada por quién es la persona igual que `identity`,
+  `vault` se monta sobre el consentimiento de `identity` y no agrega ninguna aprobación propia —declara ambas capacidades. Solo
+  dentro de una llamada que la persona inició (una pantalla, un evento de pantalla, una acción de panel), 6 por minuto; rechaza con
+  `permission_denied`, `not_member`, `not_found`, `rate_limited`, `unavailable` o `not_available`. Cachea el secreto vos mismo
+  (`kino.storage`, ~1 h). El kit responde uno falso: `KINO_VAULT_SECRET=<el secreto en JSON>`, o `KINO_VAULT_ERROR=<código>` para
+  que `get()` lance.
+- **`go: { searchScreen: true }` (aditivo, sin apiVersion nuevo):** abre la pantalla de búsqueda nativa de Kino, vacía —nada
+  escrito y sin ninguna fuente acotada—, para que la persona busque desde ahí. A diferencia de `go.search`, no lleva consulta (es
+  el botón «mándame a buscar») y no necesita capacidad. Un Kino anterior que no la conoce descarta todo el go (la pantalla queda
+  como está).
+
 ## Tests
 
 ```

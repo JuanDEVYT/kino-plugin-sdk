@@ -7,8 +7,8 @@ import { checkPanelScreenAnswer, checkScreenAnswer } from "../screen.mjs";
 const read = (v) => { const why = []; return { go: installPluginGoOf(v, (w) => why.push(w)), why }; };
 const BAD_REPO = "repo must be a plain owner/name, at most 100 characters";
 
-test("the contract lists the shape, from apiVersion 19, as the sixteenth", () => {
-  assert.equal(contract.manifest.screen.goShapes[15], "installPlugin");
+test("the contract lists the shape, from apiVersion 19, as the seventeenth", () => {
+  assert.equal(contract.manifest.screen.goShapes[16], "installPlugin");
   const I = contract.manifest.screen.goInstallPlugin;
   assert.deepEqual(I.fields, ["repo"]);
   assert.equal(I.maxRepoChars, 100);
