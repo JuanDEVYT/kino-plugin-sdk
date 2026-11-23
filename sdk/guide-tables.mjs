@@ -77,6 +77,7 @@ const GO_TEXT = {
   copy: "Kino puts the plugin's text on the clipboard and always shows its own «Copiado» toast (a TV cannot copy)",
   liveChannel: "the player tunes to an En vivo provider's channel (`provider`, `code`), only for a plugin whose player tab declares `\"kinds\": [\"live\"]`",
   syncProvider: "Kino's sync-provider settings (Ajustes ▸ Conectar ▸ Proveedor), where the person picks this plugin; only for a plugin that declares `syncProvider`",
+  relinkTelegram: "Kino's own «Reautenticar Telegram» screen, where the person re-validates this device with their Telegram account; only for a plugin that declares `identity` (the fix for a `kino.identity` that answered `not_available`)",
   setExperience: "asks for the light (`\"light\"`: no shadows, no effects, square corners) or the full (`\"full\"`) experience of the whole app; Kino asks the person first and changes nothing without their yes",
   installPlugin: "Kino's own install sheet for `repo` (a plain `owner/name`); nothing installs without the person's own Instalar",
   plugin: `another plugin's screen at \`route\` with \`args\`, or its search for \`query\`, found by \`repo\` (a GitHub \`owner/name[/path]\`; a URL or an \`@ref\` is dropped); Kino installs it first, after the person's own yes, when it is missing`,
@@ -194,7 +195,8 @@ export const TABLES = {
   })),
   screenGo: () => table(["`go`", "What opens", "Sent from"], S.goShapes.map((g) => {
     if (!GO_TEXT[g]) throw new Error(`guide-tables: no description for the go shape ${g}`);
-    const from = g === "installPlugin" || g === "plugin" ? `only the person's own ${S.goUrl.fromTriggers.join(" or ")} on your screen (a tap, a submit, the answer to one, a pop-up's button), never a panel; from apiVersion ${S[g === "plugin" ? "goPlugin" : "goInstallPlugin"].apiVersion}`
+    const from = g === "relinkTelegram" ? `only the person's own ${S.goUrl.fromTriggers.join(" or ")} (a tap, a submit, the answer to one, a pop-up's button, a panel press); from apiVersion ${S.goRelinkTelegram.apiVersion}`
+      : g === "installPlugin" || g === "plugin" ?`only the person's own ${S.goUrl.fromTriggers.join(" or ")} on your screen (a tap, a submit, the answer to one, a pop-up's button), never a panel; from apiVersion ${S[g === "plugin" ? "goPlugin" : "goInstallPlugin"].apiVersion}`
       : g === "setExperience" ? `only the person's own ${S.goUrl.fromTriggers.join(" or ")} on your screen (a tap, a submit, the answer to one, a pop-up's button), never a panel; from apiVersion ${S.goSetExperience.apiVersion}`
       : g === "useTheme" ? `only the person's own ${S.goUrl.fromTriggers.join(" or ")} on your screen (a tap, a submit, the answer to one, a pop-up's button), never a panel; from apiVersion ${S.goUseTheme.apiVersion}`
       : g === "titleByIds" || g === "url" || g === "copy" || g === "liveChannel" || g === "syncProvider"

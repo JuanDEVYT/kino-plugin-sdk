@@ -14,7 +14,7 @@ const goOf = (go) => {
 
 test("contract: syncProvider is the fourteenth shape and carries the rules", () => {
   const shapes = contract.manifest.screen.goShapes;
-  assert.equal(shapes.length, 18); // searchScreen (additive, no apiVersion) was inserted after search; useTheme, setExperience (apiVersion 18), installPlugin (apiVersion 19) and plugin (apiVersion 20) came after it
+  assert.equal(shapes.length, 19); // searchScreen (additive, no apiVersion) was inserted after search; useTheme, setExperience (apiVersion 18), installPlugin (apiVersion 19) and plugin (apiVersion 20) came after it, and relinkTelegram (apiVersion 29) closes the list
   assert.equal(shapes[13], "syncProvider");
   const P = contract.manifest.screen.goSyncProvider;
   assert.equal(P.needsCapability, "syncProvider");

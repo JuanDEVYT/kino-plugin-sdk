@@ -2668,6 +2668,12 @@ class Reader {
       const g = pluginGoOf(v, (why) => this.log(`${where} go.plugin ${why}, dropped`));
       return g === null ? null : { plugin: g };
     }
+    if (k === "relinkTelegram") {
+      // apiVersion 29: Kino's own "Reautenticar Telegram" screen; a boolean like syncProvider, gated like the others.
+      const min = contract.manifest.screen.goRelinkTelegram.apiVersion;
+      if (this.apiVersion < min) return bad(`needs apiVersion ${min}`);
+      return v === true ? { relinkTelegram: true } : bad("must be true");
+    }
     if (k === "section" || k === "categories" || k === "close" || k === "syncProvider" || k === "searchScreen") return v === true ? { [k]: true } : bad("must be true");
     if (!isObj(v)) return bad("is not an object");
     if (k === "search") {

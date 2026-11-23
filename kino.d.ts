@@ -1,4 +1,4 @@
-// TypeScript declarations for Kino plugins (apiVersion 1 to 27; 27 adds the clockLive stream field (KinoStream.clockLive: a clock-enumerated sliding-window live HLS feed Kino synthesizes itself on its local proxy, for live from an open CDN whose segment URLs are enumerable by a media clock; capability-free, live only); 26 adds to appThemes the painted surfaces, gloss, layout, assets, background image and font; 25 lets a stream's `subtitles` entry carry its own decrypted `text` (with `format`) instead of a `url` (Kino 0.9.86, provisional); 24 lets a stream's `drm` be a list of options and adds the `clearkey` type (Kino 0.9.85, provisional); 23 adds the playerSlot capability (up to three small elements in the top-right corner of the TV player: the playerSlot and playerSlotAction exports and the manifest's slot block); 22 adds the progress capability (kino.progress: how far along the person is in something that is not a video, kept by Kino and read back with `kino.progress.list`; Kino draws nothing from it, the plugin builds its own shelf); 21 adds the files capability (kino.files: files on the person's device, picked by the person, read by ranges and played through a kino-file: address); 20 adds the visualBrowser manifest key (kino.visualBrowser.open: a web window the person sees and drives, on the plugin's own hosts, to sign in or finish a step) and the plugin protocol (the manifest's provides and consumes blocks and kino.plugins.call: one plugin uses the doors another opens, through Kino); 19 adds the lyrics capability (the lyrics(query) export: a song's time-synced or plain lyrics for the music player's overlay); 18 adds the app themes (go.useTheme, go.setExperience, appThemes with price, experience and logo); 17 adds the stats operation of the library capability (kino.library.stats, a month's totals and top titles); 16 adds the coins capability (kino.coins: the person's Kino coins balance, and giving one coin for a post); 15 adds the identity capability (kino.identity.telegram: a per-plugin pseudonym of the person and the signed token that proves it), the notifications capability (kino.notifications: notices in the Home bell), library episodes (the latest season and episode of a watched series) and the pluginStore capability (the plugin is a source of plugins for Kino's store: storeSync, and storeList and storeSearch for a live store); 14 adds the screen capability (screen, screenEvent and the manifest's screen block: a full-screen canvas the plugin builds), library, playerPanelTab, playerControl, room (kino.room, a mailbox hosted on the person's device over the Internet), schedule (background jobs: the manifest's jobs and the job export) and the manifest's enhancements; 13 adds the socket capability (kino.ws, outbound WebSockets) and the byteSource capability (a stream whose bytes the plugin serves through its read export) and the storageLarge capability (a 16 MiB kino.storage for a plugin that keeps a catalog) and the catalog capability (kino.catalog, a searchable SQLite catalog of up to 100,000 items per plugin in a 64 MiB file) and the qrScan capability (kino.qr.scan, the phone's camera scanner for a QR code) and the settings form's qr setting (a QR whose text settingsStatus gives, refreshed every refreshMs) and the kino.crypto operations aesIge, modPow, gunzip, convert and aesIgeVerify and the imageSource capability (a poster, backdrop, still or hero image the plugin serves through its image export, KinoImageRef); 12 adds the syncProvider capability (syncPull, syncPush, syncStatus and the manifest's sync block); 11 adds the externalResolve capability (a stream's `external` hand-off to a resolver app, the manifest's externalResolver) and, from Kino 0.9.66, a stream's advisory `media` and its `portable` universal copy; 10 adds the playlists capability; 9 adds the player panel (panel, panelAction, playerEvent, the manifest's panel and settingsLayout), fetchHosts "any" for hand-written plugins, English setting texts and kino.meta by title; 8 adds the audio item kinds music and podcast; 7 adds tracking and segments; apiVersion 5 only adds the manifest's signature, 6 the plain-plugin SDK: typed and larger secrets, migrate, signed streams, the settings form, debug, telemetry, section, categories, theme and scopedSearch). Reference them from plugin.js
+// TypeScript declarations for Kino plugins (apiVersion 1 to 30; 30 adds the manifest's setup block (a setup step Kino runs and shows: the setupStatus and setupRun exports); 29 adds the relinkTelegram screen go (go: { relinkTelegram: true }: Kino's own "Reautenticar Telegram" screen, where the person re-validates this device with their Telegram account, for an identity plugin whose sign-in failed because this device has no Telegram validation; honoured on the person's own tap only); 28 adds the vault capability (kino.vault.get(): your plugin's own sealed secret from the Kino secrets vault; requires identity); 27 adds the clockLive stream field (KinoStream.clockLive: a clock-enumerated sliding-window live HLS feed Kino synthesizes itself on its local proxy, for live from an open CDN whose segment URLs are enumerable by a media clock; capability-free, live only); 26 adds to appThemes the painted surfaces, gloss, layout, assets, background image and font; 25 lets a stream's `subtitles` entry carry its own decrypted `text` (with `format`) instead of a `url` (Kino 0.9.86, provisional); 24 lets a stream's `drm` be a list of options and adds the `clearkey` type (Kino 0.9.85, provisional); 23 adds the playerSlot capability (up to three small elements in the top-right corner of the TV player: the playerSlot and playerSlotAction exports and the manifest's slot block); 22 adds the progress capability (kino.progress: how far along the person is in something that is not a video, kept by Kino and read back with `kino.progress.list`; Kino draws nothing from it, the plugin builds its own shelf); 21 adds the files capability (kino.files: files on the person's device, picked by the person, read by ranges and played through a kino-file: address); 20 adds the visualBrowser manifest key (kino.visualBrowser.open: a web window the person sees and drives, on the plugin's own hosts, to sign in or finish a step) and the plugin protocol (the manifest's provides and consumes blocks and kino.plugins.call: one plugin uses the doors another opens, through Kino); 19 adds the lyrics capability (the lyrics(query) export: a song's time-synced or plain lyrics for the music player's overlay); 18 adds the app themes (go.useTheme, go.setExperience, appThemes with price, experience and logo); 17 adds the stats operation of the library capability (kino.library.stats, a month's totals and top titles); 16 adds the coins capability (kino.coins: the person's Kino coins balance, and giving one coin for a post); 15 adds the identity capability (kino.identity.telegram: a per-plugin pseudonym of the person and the signed token that proves it), the notifications capability (kino.notifications: notices in the Home bell), library episodes (the latest season and episode of a watched series) and the pluginStore capability (the plugin is a source of plugins for Kino's store: storeSync, and storeList and storeSearch for a live store); 14 adds the screen capability (screen, screenEvent and the manifest's screen block: a full-screen canvas the plugin builds), library, playerPanelTab, playerControl, room (kino.room, a mailbox hosted on the person's device over the Internet), schedule (background jobs: the manifest's jobs and the job export) and the manifest's enhancements; 13 adds the socket capability (kino.ws, outbound WebSockets) and the byteSource capability (a stream whose bytes the plugin serves through its read export) and the storageLarge capability (a 16 MiB kino.storage for a plugin that keeps a catalog) and the catalog capability (kino.catalog, a searchable SQLite catalog of up to 100,000 items per plugin in a 64 MiB file) and the qrScan capability (kino.qr.scan, the phone's camera scanner for a QR code) and the settings form's qr setting (a QR whose text settingsStatus gives, refreshed every refreshMs) and the kino.crypto operations aesIge, modPow, gunzip, convert and aesIgeVerify and the imageSource capability (a poster, backdrop, still or hero image the plugin serves through its image export, KinoImageRef); 12 adds the syncProvider capability (syncPull, syncPush, syncStatus and the manifest's sync block); 11 adds the externalResolve capability (a stream's `external` hand-off to a resolver app, the manifest's externalResolver) and, from Kino 0.9.66, a stream's advisory `media` and its `portable` universal copy; 10 adds the playlists capability; 9 adds the player panel (panel, panelAction, playerEvent, the manifest's panel and settingsLayout), fetchHosts "any" for hand-written plugins, English setting texts and kino.meta by title; 8 adds the audio item kinds music and podcast; 7 adds tracking and segments; apiVersion 5 only adds the manifest's signature, 6 the plain-plugin SDK: typed and larger secrets, migrate, signed streams, the settings form, debug, telemetry, section, categories, theme and scopedSearch). Reference them from plugin.js
 // with `/// <reference path="./kino.d.ts" />` for editor help; Kino itself runs plain JavaScript.
 // The numbers in the comments come from contract.json, which is authoritative. The app checks that
 // every `kino` member declared here exists in its runtime and nothing else does (KinoDtsTest).
@@ -1140,6 +1140,35 @@ type KinoManifestConsumes = Record<string, KinoManifestConsumesEntry>;
 /** Why `kino.plugins.call` rejected (the Error's `code`). */
 type KinoProtocolErrorCode = "provider_missing" | "not_declared" | "bad_input" | "bad_output" | "rate_limited" | "timeout" | "provider_failed";
 
+/** Why `kino.plugins.setup` or `kino.plugins.setupStatus` rejected (the Error's `code`, apiVersion 30). */
+type KinoSetupErrorCode = "not_installed" | "no_setup" | "bad_request" | "refused" | "permission_denied" | "busy" | "rate_limited" | "timeout";
+
+/** What `kino.plugins.setup` resolves with (apiVersion 30): the target's setup started (`SETTING_UP`), or it already was ready. */
+interface KinoSetupStarted { state: "SETTING_UP" | "READY" }
+
+/** apiVersion 30: the answer of `setupStatus()`. */
+interface KinoSetupStatus {
+  /** True when the plugin needs nothing more from the person. */
+  ready: boolean;
+  /** A short line Kino shows while the plugin is not ready (and in its reminder). */
+  label?: string;
+  /** 0 to 1, how far a setup in progress is. */
+  progress?: number;
+}
+
+/** apiVersion 30: what `kino.plugins.setupStatus(repo)` answers about another plugin's setup. */
+interface KinoPluginSetupStatus extends KinoSetupStatus {
+  /** True only while Kino's own setup loop for that plugin runs: `!ready && !running` means it stopped without finishing. */
+  running: boolean;
+}
+
+/** apiVersion 30: the answer of one `setupRun` call. Kino keeps calling with step 0, 1, 2... until `done` or an error. */
+interface KinoSetupStep {
+  done: boolean;
+  progress?: number;
+  label?: string;
+}
+
 /**
  * The `arg` of the screenEvent named `protocol` (apiVersion 20): the new items of a stream your screen switched on with
  * `state.protocol.<alias>.<stream> = true`, each validated against the stream's `out`. An object here, not the string `arg` of
@@ -1341,7 +1370,20 @@ type KinoScreenGo =
   | { setExperience: "light" | "full" }
   | { installPlugin: KinoScreenInstallPlugin }
   | { liveChannel: KinoScreenLiveChannel }
-  | { syncProvider: true };
+  | { syncProvider: true }
+  | { relinkTelegram: true };
+
+/**
+ * `go: { relinkTelegram: true }` (apiVersion 29, the nineteenth shape): Kino opens its own "Reautenticar Telegram" screen, where the
+ * person re-validates this device with their Telegram account. For an identity plugin whose sign-in failed because this device has no
+ * Telegram validation (`kino.identity.telegram` rejected with `not_available`): instead of only naming Kino's settings in text, it sends
+ * the person to the very screen that fixes it. It carries nothing and signs no one in, so pair it with your own "Retry" once they return.
+ *
+ * - Only for a plugin that declares the `identity` capability (else dropped, logged `not_identity`), and only after the person's own tap
+ *   or press (as `go.url` and `go.copy`).
+ * - A Kino below apiVersion 29 drops the whole `go`, logged; show the button only when `kino.pluginApiVersion >= 29` (keep a lower base and
+ *   opt in with `enhancements: { "29": {} }`), and keep your own written instruction beside it.
+ */
 
 /**
  * `go: { syncProvider: true }` (the thirteenth shape): Kino opens its own sync-provider settings (Ajustes ▸ Conectar ▸ Proveedor),
@@ -2412,6 +2454,10 @@ interface KinoPlugin {
    * 32 read, unknown keys ignored). A `qr` setting with no text draws nothing.
    */
   settingsStatus?(): Promise<{ [key: string]: string | string[] | undefined; hide?: string[] }>;
+  /** apiVersion 30: required when the manifest declares `setup`. Cheap (10 s); also asked at app start, so it gets only what Home may use. */
+  setupStatus?(): Promise<KinoSetupStatus>;
+  /** apiVersion 30: required when the manifest declares `setup`. Does ONE bounded chunk of the setup (20 s) and answers `{ done, progress?, label? }`; `step` counts 0, 1, 2... while Kino keeps calling until `done` or an error. `inputs` holds the values another plugin set from the manifest's `setup.inputs` whitelist. Keep your own progress in `kino.storage`: if the app closes, the next run resumes. Runs from a call the person started (like a screen event). */
+  setupRun?(args: { inputs?: { [key: string]: string | boolean }; step: number }): Promise<KinoSetupStep>;
   /** apiVersion 6: required when a setting has `type: "action"`. Runs when the person presses that button (30 s); the `message` (at most 300 characters, default "Listo") is shown; settingsStatus() is asked again after every action (and when the form opens); `refresh: true` is still accepted and changes nothing. `clearSettings` (up to 12 keys of your own optional, valued settings: not a `required` one, not a section/status/action) is emptied by Kino right after a successful action, as if the person had emptied the field and saved (a password leaves the Keystore; your sandbox closes as for any saved change; `kino.storage` survives); anything else in it is dropped. A throwing action clears nothing. `link` (Kino 0.9.74, additive `action.link`): Kino asks the person with its OWN question ("¿Eres tú, <candidate>?" / "Is this you, <candidate>?", naming your plugin by its manifest `name`) and runs the `confirm` action exactly once only if they confirm; Cancel runs nothing and your plugin hears nothing. `candidate`: 1 to 64 characters after trimming, runs of spaces collapsed; no control or invisible formatting characters, no space but the ASCII one, no blank fillers (U+115F, U+1160, U+3164, U+FFA0, U+2800); scrubbed of your secrets and shown as plain text. `confirm`: the key of ANOTHER `action` setting of this plugin that declares no `confirm`/`confirmEn` question of its own. Anything else refuses the link: your `message` still shows, with Kino's generic error. A `link` in the confirm action's own answer is ignored. `setSettings` (Kino 0.9.74, additive `action.setSettings`): up to 8 of your own `text` or `select` settings and, from apiVersion 13, `password` settings (never a `url`: only the person types a server; never a toggle or list) with string values, checked like typed values (a required one is never emptied; your `validateSettings` is not run); Kino saves them through the form's own save, so they reach the person's other devices like typed values. An unknown or secret key, a non-string, a bad value, a key also in `clearSettings`, a value holding one of your secrets or more than 8 keys refuse the whole field: nothing is applied and the form shows Kino's generic error under your message. A password filled this way (apiVersion 13, a "Create key" action) is stored sealed exactly like a typed one, never logged, and scrubbed from this answer's `message` and `link`, so it is never shown back. */
   action?(key: string): Promise<{ message?: string; refresh?: boolean; clearSettings?: string[]; setSettings?: Record<string, string>; link?: { candidate: string; confirm: string } } | null | void>;
   /**
@@ -2606,7 +2652,14 @@ interface KinoNuvioStreamsRequest extends KinoNuvioScrapersRequest {
 interface KinoNuvioScraper { id: string; name: string }
 
 /** One scraper a repository offers (`kino.nuvio.available`). */
-interface KinoNuvioOffered extends KinoNuvioScraper { description: string; types: string[]; languages: string[]; compatible: boolean; installed: boolean }
+interface KinoNuvioOffered extends KinoNuvioScraper {
+  description: string; types: string[]; languages: string[]; compatible: boolean; installed: boolean;
+  /**
+   * `true` when the person deleted this scraper (one by one, or the whole repository) in Plugins ▸ De terceros and has not installed it
+   * again: do not offer or use it again (`use` fails it with code `removed`). Absent otherwise; an older Kino never sends it.
+   */
+  removed?: boolean;
+}
 
 /** One copy a scraper found: a `Stream`'s fields, copies included; a lazy copy (no address yet) is left out. */
 interface KinoNuvioStream {
@@ -3660,6 +3713,8 @@ declare namespace kino {
     /**
      * Makes sure each scraper in `scrapers` (at most 12) is installed, installing the missing ones one after another (up to 45 s each). A scraper that
      * cannot be installed is in `failed` (`refused` for a torrent-based one, `not_found`, `timeout`, `failed`) and the rest go on.
+     * `removed`: the person deleted this scraper (or its whole repository) and has not installed it again, so Kino never reinstalls it
+     * for a plugin; drop it from what you offer (an older Kino never sends this code).
      */
     function use(query: { repo: string; scrapers: string[] }): Promise<{ ready: string[]; failed: { id: string; code: string; message: string }[] }>;
     /** The scrapers of `repo` that are installed and on right now (18+ ones are never listed), in install order. */
@@ -3909,6 +3964,27 @@ declare namespace kino {
    */
   namespace plugins {
     function call(alias: string, call: string, arg?: unknown): Promise<unknown>;
+    /**
+     * apiVersion 30: asks Kino to set up the plugin installed from `repo` (a plain GitHub `owner/name`), writing only the
+     * `inputs` its manifest declares in `setup.inputs` (a select's value among the declared options, a toggle's a boolean, a
+     * text's a string; never a setting with `unlockWith`). Kino asks the person first ("<your plugin> quiere configurar
+     * <target>", both installed names and each input in the target's own labels). Resolves as soon as the setup has started,
+     * `{ state: "SETTING_UP" }` (or `"READY"` when it already was and you gave no inputs): follow it with `setupStatus`, e.g.
+     * from a screen timer; the setup goes on under Kino if your screen closes. Only from a call the person started
+     * (`screen`, `screenEvent`, `panelAction`), never a timer's tick, Home, search, a job or your own `setupRun`. Rejects with a
+     * [KinoSetupErrorCode]: `not_installed` (not installed, switched off, or 18+ while your plugin is not), `no_setup`,
+     * `bad_request` (an input it does not declare, a bad value, your own repo), `refused` (the person said no),
+     * `permission_denied` (not the person's call, or an 18+ target while the 18+ lock is closed), `busy` (another question is
+     * up, or its setup already runs and you gave inputs), `rate_limited`
+     * (4 in any 10 s) or `timeout` (nobody answered in 120 s). Feature-detect with `typeof kino.plugins.setup === "function"`.
+     */
+    function setup(repo: string, inputs?: Record<string, string | boolean>): Promise<KinoSetupStarted>;
+    /**
+     * apiVersion 30: where the setup of the plugin installed from `repo` stands on this device, as Kino last heard it (no call
+     * to that plugin): `{ ready, running, progress?, label? }` ([KinoPluginSetupStatus]). From any call (a screen timer's tick
+     * too), 30 in any 10 s; rejects with `not_installed`, `no_setup`, `bad_request` or `rate_limited` like `setup`.
+     */
+    function setupStatus(repo: string): Promise<KinoPluginSetupStatus>;
   }
 
   /**

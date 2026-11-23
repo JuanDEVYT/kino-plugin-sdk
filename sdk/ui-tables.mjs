@@ -510,6 +510,7 @@ const GO_FIELDS = {
   copy: `\`{ copy: { ${S.goCopy.fields.join(", ")} } }\``,
   liveChannel: `\`{ liveChannel: { ${S.goLiveChannel.fields.join(", ")} } }\``,
   syncProvider: "`{ syncProvider: true }`",
+  relinkTelegram: "`{ relinkTelegram: true }`",
   useTheme: `\`{ useTheme: { ${S.goUseTheme.fields.join(", ")} } }\``,
   installPlugin: `\`{ installPlugin: { ${S.goInstallPlugin.fields.join(", ")} } }\``,
   plugin: `\`{ plugin: { ${S.goPlugin.fields.join(", ")} } }\``,
@@ -530,12 +531,14 @@ const GO_OPENS = {
   copy: `Kino copies \`text\` (at most ${S.goCopy.maxTextChars} characters, ${S.goCopy.maxLines} lines) and shows its own «Copiado» toast; a TV cannot`,
   liveChannel: "tunes the player to an En vivo provider's channel (only for a plugin whose player tab joins live channels)",
   syncProvider: "Kino's sync-provider settings (Ajustes ▸ Conectar ▸ Proveedor), where the person picks this plugin (only for a plugin with `syncProvider`)",
+  relinkTelegram: "Kino's own «Reautenticar Telegram» screen, to re-validate this device with Telegram (only for a plugin with `identity`)",
   useTheme: "turns on one of this plugin's own `appThemes` as Apariencia does, or back to Kino's theme with `theme: null`; Kino shows its own toast",
   setExperience: "asks for the light or the full experience of the whole app; Kino asks the person first and changes nothing without their yes",
   installPlugin: "Kino's own install sheet for `repo` (a plain `owner/name`); nothing installs without the person's own Instalar",
   plugin: "another plugin's screen at `route` with `args`, or its search for `query`, found by `repo` (a GitHub `owner/name[/path]`)",
 };
-const goFrom = (g) => g === "plugin" ? `only the person's own ${S.goUrl.fromTriggers.join(" or ")} on your screen, from apiVersion ${S.goPlugin.apiVersion}`
+const goFrom = (g) => g === "relinkTelegram" ? `only the person's own ${S.goUrl.fromTriggers.join(" or ")}, from apiVersion ${S.goRelinkTelegram.apiVersion}`
+  : g === "plugin" ?`only the person's own ${S.goUrl.fromTriggers.join(" or ")} on your screen, from apiVersion ${S.goPlugin.apiVersion}`
   : g === "installPlugin" ? `only the person's own ${S.goUrl.fromTriggers.join(" or ")} on your screen, from apiVersion ${S.goInstallPlugin.apiVersion}`
   : g === "setExperience" ? `only the person's own ${S.goUrl.fromTriggers.join(" or ")} on your screen, from apiVersion ${S.goSetExperience.apiVersion}`
   : g === "useTheme" ? `only the person's own ${S.goUrl.fromTriggers.join(" or ")} on your screen, from apiVersion ${S.goUseTheme.apiVersion}`

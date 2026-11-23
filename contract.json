@@ -1,8 +1,8 @@
 {
   "$comment": "Kino plugin contract, apiVersion 1 to 27. The single source of truth for every number and rule a plugin meets. The app checks each value against its own code, and a test in the app pins this file to it; sdk/validate.mjs, sdk/run.mjs and the guide's tables read this file. apiVersion 12 (sync providers), 13 and 14 (plugin screens: screen, library, playerPanelTab, playerControl, room, schedule, ai, shared, enhancements) all arrive in Kino 0.9.74, the next release (not published yet); a Kino before 0.9.74 refuses all three. apiVersion 16 (coins) arrives in Kino 0.9.78; apiVersion 17 (kino.library.stats, Tu mes en Kino) arrives in Kino 0.9.81. apiVersion 18 (appThemes, a plugin's whole-app looks) arrives in Kino 0.9.81. apiVersion 19 (lyrics, the screen additions) and apiVersion 20 (visualBrowser, a web window the person drives; the plugin protocol: provides, consumes, kino.plugins.call) also arrive in Kino 0.9.81. apiVersion 21 (files) arrives in Kino 0.9.82; apiVersion 22 (progress, how far along the person is in something in a plugin, read back with list) in Kino 0.9.83 (provisional, like 23); apiVersion 23 (playerSlot) in Kino 0.9.83 (provisional: the number moves if the release does). apiVersion 24 (a Stream's drm as a list of options, and ClearKey blocks) in Kino 0.9.85 (provisional). apiVersion 27 (the clockLive stream field: a clock-enumerated live HLS window Kino synthesizes itself on its local proxy, for live from an open CDN) arrives in Kino 0.9.88.",
-  "apiVersion": 28,
-  "maxApiVersion": 28,
-  "apiVersionFromApp": { "6": "0.9.50", "7": "0.9.51", "8": "0.9.54", "9": "0.9.55", "10": "0.9.65", "11": "0.9.66", "12": "0.9.74", "13": "0.9.74", "14": "0.9.74", "15": "0.9.77", "16": "0.9.78", "17": "0.9.81", "18": "0.9.81", "19": "0.9.81", "20": "0.9.81", "21": "0.9.82", "22": "0.9.83", "23": "0.9.83", "24": "0.9.85", "25": "0.9.86", "26": "0.9.87", "27": "0.9.88", "28": "0.9.90" },
+  "apiVersion": 30,
+  "maxApiVersion": 30,
+  "apiVersionFromApp": { "6": "0.9.50", "7": "0.9.51", "8": "0.9.54", "9": "0.9.55", "10": "0.9.65", "11": "0.9.66", "12": "0.9.74", "13": "0.9.74", "14": "0.9.74", "15": "0.9.77", "16": "0.9.78", "17": "0.9.81", "18": "0.9.81", "19": "0.9.81", "20": "0.9.81", "21": "0.9.82", "22": "0.9.83", "23": "0.9.83", "24": "0.9.85", "25": "0.9.86", "26": "0.9.87", "27": "0.9.88", "28": "0.9.90", "29": "0.9.91", "30": "0.9.91" },
   "additiveFromApp": { "kino.meta": "0.9.53", "kino.tmdb": "0.9.53", "catalogOnly": "0.9.54", "kino.browser.captureAll": "0.9.54", "fetch.errorHost": "0.9.55", "kino.fetchAnyHost": "0.9.55",
     "kino.meta.byTitle": "0.9.55", "kino.device": "0.9.55", "kino.seed": "0.9.55", "panel.loading": "0.9.64", "kino.nuvio": "0.9.71", "kino.sync.remoteChanged": "0.9.74", "action.link": "0.9.74", "action.setSettings": "0.9.74",
     "kino.library.episode": "0.9.77", "kino.sync.setActive": "0.9.78", "recommends": "0.9.81", "screen.installed": "0.9.81", "scaffold.onBack": "0.9.81", "appBar.mergeWithKinoBar": "0.9.81", "visualBrowser": "0.9.81", "kino.visualBrowser.available": "0.9.81", "protocol.ctx": "0.9.84", "openFrom": "0.9.84", "go.plugin": "0.9.84", "kino.image.thumbnail": "0.9.84",
@@ -99,10 +99,22 @@
       "badRoutesMessage": "The \"openFrom.routes\" field must list 1 to 16 different screen route names (1 to 64 letters, digits or . _ ~ -)",
       "fromApp": "0.9.84"
     },
+    "setup": {
+      "$comment": "apiVersion 30, also valid in enhancements[\"30\"]: \"setup\": { \"route\"?, \"inputs\"? } declares a setup step Kino can run and show. route is one of this plugin's own screen routes (needs the screen capability); without it Kino shows its generic setup sheet. inputs is a whitelist over the plugin's OWN settings another plugin may set through kino.plugins.setup: each key an existing select, toggle or text setting (never a password), { type, options? } with type the setting's own and, for a select, options a subset of the setting's option values. Declaring setup requires the exports setupStatus and setupRun.",
+      "apiVersion": 30,
+      "field": "setup",
+      "exports": { "status": "setupStatus", "run": "setupRun" },
+      "inputTypes": ["select", "toggle", "text"],
+      "needsApiMessage": "The \"setup\" block needs apiVersion 30",
+      "notObjectMessage": "The \"setup\" field must be an object with an optional \"route\" and \"inputs\"",
+      "needsScreenMessage": "The \"setup.route\" field needs the \"screen\" capability",
+      "badRouteMessage": "The \"setup.route\" field must be a screen route name (1 to 64 letters, digits or . _ ~ -)",
+      "badInputsMessage": "The \"setup.inputs\" field must be an object of { type, options? } over the plugin's own select, toggle or text settings, a select listing options the setting has"
+    },
     "enhancements": {
       "$comment": "\"enhancements\": { \"<apiVersion>\": { \"capabilities\"?, \"screen\"?, \"settings\"?, \"panel\"? } } (Task 8c; panel, Task 8k). A plugin keeps its own apiVersion, so a Kino older than fromApiVersion (which ignores the unknown key) installs and runs it as before, and lists under the apiVersion that brought them the features only a newer Kino reads. A Kino merges each key it supports (key <= maxApiVersion), in numeric order, over the manifest: capabilities are added, screen, settings and panel replaced, then the whole manifest is validated at that key's apiVersion. A block that fails is dropped and logged (dropped messages, after \"enhancements.<key>: \"), and an enhancement never refuses the plugin: a key at or below the plugin's apiVersion (notAboveApi), a setting whose type differs from the one the manifest declares (settingRetyped: keep the list a superset of the base one), a screen.replaces the plugin's own apiVersion has no Categorías for (replacesNeedsCategories), and, once the script is probed, exports the block newly needs and the script lacks (missingExports) all drop the block. A key above the Kino's maxApiVersion is ignored silently. The kit's validate reports every drop as a problem. The plugin's apiVersion never moves (its old behaviour stays); only the capabilities listed here gate on the enhancement's apiVersion. A block that adds playerPanelTab must carry the panel with contributes: true, and the other way round (panelTabNeedsPanel). Consent lines of added capabilities (library, playerPanelTab) are asked at install and update like any other; until approved, kino.library calls are refused with permission_denied. Task 18 (G1, apiVersion stays 14): a block may also add schedule (with its jobs, the jobs field: each needs the other, so a block with one and not the other is dropped; a top-level jobs of a manifest whose own apiVersion is below kinoJobs.apiVersion is never read), shared and ai, under exactly the consent of a plain manifest: schedule and ai are red lines asked at install and on the update that adds them, never approved by Kino on its own, unticked in a kit import, revocable in Ajustes; shared is a plain line. Their features gate on the manifest's featureApiVersion, so an older apiVersion plugin runs its jobs, kino.shared and kino.ai on a Kino that read the block, and nowhere else. Task 18 (G13): a block's settings list may not change the sync of a key the manifest (or an earlier block) declares, each list's sync as its own apiVersion reads it (below settings.sync.apiVersion every setting syncs), else the block is dropped (settingResynced): a value would sync on one Kino and stay on the device on another; a new key may say sync false.",
       "fromApiVersion": 14,
-      "fields": ["capabilities", "screen", "settings", "panel", "jobs", "provides", "consumes", "openFrom", "visualBrowser", "slot"],
+      "fields": ["capabilities", "screen", "settings", "panel", "jobs", "provides", "consumes", "openFrom", "visualBrowser", "slot", "setup"],
       "capabilities": ["screen", "library", "playerPanelTab", "playerControl", "room", "schedule", "shared", "ai", "files", "progress", "playerSlot"],
       "keyPattern": "^[1-9][0-9]{0,3}$",
       "dropped": {
@@ -114,7 +126,7 @@
         "replacesNeedsCategories": "\"screen.replaces\" needs the plugin's categories, which need its own apiVersion to be {min} or more",
         "missingExports": "needs the exports {exports}",
         "blockNotObject": "must be an object",
-        "badField": "\"{field}\" can't be enhanced (only capabilities, screen, settings, panel, jobs, visualBrowser and slot)",
+        "badField": "\"{field}\" can't be enhanced (only capabilities, screen, settings, panel, jobs, provides, consumes, openFrom, visualBrowser, slot and setup)",
         "capabilitiesNotList": "\"capabilities\" must be a list",
         "badCapability": "the \"{capability}\" capability can't be added by an enhancement (only screen, library, playerPanelTab, playerControl, room, schedule, shared, ai, files, progress and playerSlot)",
         "panelTabNeedsPanel": "\"playerPanelTab\" and \"panel.contributes\" must come together in the same enhancement",
@@ -136,6 +148,7 @@
       "goCopy": { "fields": ["text", "label", "sensitive"], "maxTextChars": 500, "maxLines": 6, "maxLabelChars": 40, "textScrubPattern": "[\\u0000-\\u0009\\u000B-\\u001F\\u007F-\\u009F\\u061C\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]", "labelScrubPattern": "[\\u0000-\\u001F\\u007F-\\u009F\\u061C\\u200B-\\u200F\\u2028\\u2029\\u202A-\\u202E\\u2066-\\u2069\\uFEFF]", "minIntervalMs": 500, "perMinutePerPlugin": 20, "fromTriggers": ["press", "submit"] },
       "goSyncProvider": { "$comment": "{ syncProvider: true } opens Kino's sync-provider settings (Ajustes > Conectar > Proveedor), where the person picks THIS plugin as the provider. It carries nothing and changes no choice by itself. Honoured only for a plugin that declares the syncProvider capability (else dropped, logged notSyncProviderLog) and only after the person's own press or submit (fromTriggers, as url and copy).", "value": true, "needsCapability": "syncProvider", "notSyncProviderLog": "not_sync_provider", "fromTriggers": ["press", "submit"] },
       "goSearchScreen": { "$comment": "{ searchScreen: true } opens Kino's native search screen, empty: nothing typed, no source narrowed to, so the person searches from there. Unlike { search: { q } } it carries no query (it is the \"send me to search\" button). Additive, no apiVersion of its own: an older Kino that does not know the key drops the whole go (the screen stays as it is). No capability is needed, since it is only navigation to a Kino page.", "value": true },
+      "goRelinkTelegram": { "$comment": "apiVersion 29: { relinkTelegram: true } opens Kino's own \"Reautenticar Telegram\" screen, where the person re-validates this device with their Telegram account. For an identity plugin whose sign-in failed because this device has no Telegram validation: instead of only naming Kino's settings in text, it sends the person to the very screen that fixes it. It carries nothing and signs no one in. Honoured only for a plugin that declares the identity capability (else dropped, logged notIdentityLog) and only after the person's own press or submit (fromTriggers, as url and copy). A Kino below apiVersion 29 drops the whole go, logged, so keep your own written instruction beside the button (feature-detect with kino.pluginApiVersion >= 29).", "value": true, "needsCapability": "identity", "notIdentityLog": "not_identity", "fromTriggers": ["press", "submit"], "apiVersion": 29 },
       "goSetExperience": { "$comment": "apiVersion 18: { setExperience: \"light\" | \"full\" } asks for the light experience (no shadows, no effects, square corners) or the full one of the whole app: the same two presets as Ajustes > Experiencia visual. Only from the person's own press or submit on the plugin's own screen, never a panel or a notice. Kino asks the person first, in its own words, naming the plugin, and changes nothing without their yes; when the app already has that experience nothing is asked. A theme may also suggest one with its `experience` field, asked the same way when the theme is turned on.", "words": ["light", "full"], "apiVersion": 18 },
       "goInstallPlugin": { "$comment": "apiVersion 19: { installPlugin: { repo: \"owner/name\" } } opens Kino's own install sheet for that repo (the same preview and consent sheet as Agregar un plugin: what it connects to, Instalar or Cancelar). Nothing installs without the person's own Instalar there. The sheet opens over the plugin's own screen (no navigation to Plugins). When that plugin is already installed Kino opens nothing and shows its own toast (Ese plugin ya está instalado / That plugin is already installed); read installed (the screen argument, from the manifest's recommends) to offer a tile only for what is missing. repo is a plain GitHub owner/name, kept as written (case untouched): a URL (anything with ://), a sub-path or an @ref is dropped. Only from the person's own press or submit on the plugin's own screen (fromTriggers, as url and copy), never a panel, a notice, open, a timer or a change.", "fields": ["repo"], "maxRepoChars": 100, "apiVersion": 19 },
       "goPlugin": { "$comment": "apiVersion 20: { plugin: { repo, route?, args?, query? } } opens another plugin's screen (route, with args) or its search (query). repo is a GitHub owner/name with an optional sub-path (owner/name/plugins/x), kept in its canonical form: a URL (anything with ://) or an @ref is dropped, at most 200 characters. route is a go.screen route; args is a JSON object within the go.screen args cap; query is at most 200 characters. Only from the person's own press or submit on the plugin's own screen (fromTriggers, as url and copy), never a panel, a notice, open, a timer or a change.", "fields": ["repo", "route", "args", "query"], "maxRepoChars": 200, "maxQueryChars": 200, "fromTriggers": ["press", "submit"], "apiVersion": 20 },
@@ -165,7 +178,7 @@
       "sizeScale": [16, 24, 32, 40, 48, 64, 80, 96, 120, 160, 200, 240, 320, 400, 480, 560, 640],
       "uiOps": ["show", "hide", "toggle", "enable", "disable", "focus", "set", "clear", "open", "close", "fullscreen"],
       "goKinds": ["movie", "series", "episode", "live", "music", "podcast"],
-      "goShapes": ["title", "play", "search", "searchScreen", "browse", "section", "categories", "close", "screen", "titleByIds", "url", "copy", "liveChannel", "syncProvider", "useTheme", "setExperience", "installPlugin", "plugin"],
+      "goShapes": ["title", "play", "search", "searchScreen", "browse", "section", "categories", "close", "screen", "titleByIds", "url", "copy", "liveChannel", "syncProvider", "useTheme", "setExperience", "installPlugin", "plugin", "relinkTelegram"],
       "widgets": ["col", "row", "box", "card", "spacer", "divider", "scroll", "grid", "text", "image", "icon", "badge", "progress", "loading", "list", "button", "textInput", "textArea", "dropdown", "toggle", "checkbox", "radioGroup", "slider", "chips", "tabs", "emptyState", "errorState", "titleCard", "titleRail", "titleGrid", "heroCard", "popup", "form", "settings", "banner", "accordion", "skeleton", "qr", "stepper", "table", "fab", "listTile", "avatar", "pageView", "scaffold", "appBar", "navigationBar", "steps", "pages"],
       "tableParts": ["tr", "td"],
       "notInTableCell": ["list", "scroll", "table"],
@@ -522,7 +535,9 @@
     "segments": 8000,
     "lyrics": 10000,
     "meta": 6000,
-    "prepare": 15000
+    "prepare": 15000,
+    "setupStatus": 10000,
+    "setupRun": 20000
   },
   "prepare": {
     "$comment": "The optional export prepare(ref) (owner 2026-11-18; additive: no apiVersion, at every one, an older Kino never calls it; additiveFromApp[\"export.prepare\"]). For a plugin whose resolve must not run for titles nobody plays (a backend quota per account, plays counted or trials spent on resolve): once the person has stayed dwellMs on the title page of one of its titles, Kino calls prepare(ref) for what the page's play button would start, ref being the very string resolve(ref) gets for it (a movie, an episode or a lone track; never a series or a live channel), so the plugin can warm what that resolve will need (a session, an authorization). Its answer is ignored and nothing is kept: pressing play calls resolve as always. A background call within timeoutsMs.prepare: nobody is asked anything (a kino.fetch that would need the person to approve a host fails instead), its failures and timeouts never count toward \"No responde\", and the person's own calls go first in the plugin's queue. At most once per ref in perRefEveryMs (a failed call counts), and at most perMinute calls a minute per plugin, shared with resolveAhead's. Never called beside notCalledBeside: a manifest whose \"resolveAhead\": true stands (Kino resolves ahead instead), catalogOnly (Kino never calls that resolve) and browser, true or \"pages\" (a hidden page needs a play the person started). Never for an 18+ plugin while the person's 18+ code is locked, a title with a finished download, or a plugin that is off or waiting for its settings. It must not start a play, count one, or spend anything of the person's (a quota, a trial, a free play). sdk/validate.mjs warns when the export is never called and notes what it means otherwise; sdk/run.mjs <folder> prepare <ref> runs it.",
@@ -783,7 +798,11 @@
     "maxUse": 12,
     "installTimeoutMs": 45000,
     "parallel": 4,
-    "resolveTimeoutMs": 75000
+    "resolveTimeoutMs": 75000,
+    "$comment": "A scraper the person deleted in Plugins > De terceros (one by one, or its whole repository by Borrar todo) and has not installed again by hand: available() adds removedField: true to its entry and use() lists it in failed with removedCode; Kino never reinstalls it for a plugin. Additive: an older Kino never sends either.",
+    "removedField": "removed",
+    "removedCode": "removed",
+    "useFailCodes": ["removed", "not_found", "refused", "timeout", "failed"]
   },
   "kinoTmdb": {
     "fromApp": "0.9.53",
@@ -1083,7 +1102,7 @@
     "functions": ["telegram"],
     "answerFields": ["id", "token"],
     "challengeFields": ["deviceKey", "signature", "author", "codeHash"],
-    "fromFunctions": ["screen", "screenEvent", "panelAction"],
+    "fromFunctions": ["screen", "screenEvent", "panelAction", "setupRun"],
     "perMinute": 10,
     "maxRequestChars": 512,
     "challengePattern": "^[A-Za-z0-9_-]{16,128}$",
@@ -1112,10 +1131,10 @@
     "requires": "identity",
     "featureDetect": "typeof kino.vault === \"object\"",
     "functions": ["get"],
-    "fromFunctions": ["screen", "screenEvent", "panelAction"],
+    "fromFunctions": ["screen", "screenEvent", "panelAction", "setupRun"],
     "perMinute": 6,
     "maxRequestChars": 64,
-    "badRequestMessage": "kino.vault.get takes no arguments",
+    "badRequestMessage": "kino.vault.get takes nothing",
     "errorCodes": ["permission_denied", "not_member", "not_found", "rate_limited", "unavailable", "not_available", "bad_request"]
   },
   "kinoNotifications": {
@@ -1262,6 +1281,22 @@
       "maxCalls": 30,
       "windowMs": 10000,
       "maxPayloadBytes": 65536
+    },
+    "setup": {
+      "$comment": "apiVersion 30: one plugin asks Kino to set up another (spec 2026-11-21-plugin-setup section 4.6). kino.plugins.setup(repo, inputs?) names the target by repository (owner/name, normalised like consumes; never by id, so a fork does not stand in), and inputs is an object of keys the TARGET's manifest declares in setup.inputs (a select's value among its declared options, a toggle's a boolean, a text's a string within the setting's own limits); a setting with unlockWith is never settable this way. No consumes entry and no capability are needed: Kino is the broker. Kino checks, in order: the caller's rate (maxCalls per windowMs, each attempt counts), the target (installed and switched on, even while it needs setup; never the caller itself; an 18+ target is not_installed to a caller that is not 18+, and permission_denied to any caller while the person's 18+ lock is closed; it declares setup, else no_setup), every input (bad_request, nothing asked or written), then asks the person in its own dialog (\"<caller> quiere configurar <target>\", both installed names and each input in the target's own setting and option labels; askTimeoutMs to answer; that wait never counts toward the calling export's own time limit, nor the screen's outer bound, and afterGraceMs is left of both once it ends, so the promise always settles with the answer or timeout). On their OK Kino writes the inputs into the target's settings (the active profile's) and starts the target's setup loop, and setup resolves { state: \"SETTING_UP\" } at once (a download outlives any caller budget); a target already READY given no inputs resolves { state: \"READY\" } without asking, one whose setup already runs { state: \"SETTING_UP\" } (busy when inputs were given). Only from a call the person started, from fromFunctions; never a job, a screen timer's tick, Home, search or a setupRun step (a setup runs long after the person's tap: identity and the vault still answer there, this question does not) (permission_denied). kino.plugins.setupStatus(repo) answers { ready, running, progress?, label? } (statusFields) as Kino last heard it from the target (no call to it); running is true only while Kino's own setup loop for the target runs, so !ready && !running means its setup stopped without finishing (start it again with kino.plugins.setup), from any live call (a screen timer following the setup too), at most maxStatusCalls per windowMs. Neither is available in background jobs (kino.plugins is a forbidden API of jobs) nor to sign(). Feature-detect with typeof kino.plugins.setup === \"function\".",
+      "apiVersion": 30,
+      "function": "kino.plugins.setup",
+      "statusFunction": "kino.plugins.setupStatus",
+      "fromFunctions": ["screen", "screenEvent", "panelAction"],
+      "statusFields": ["ready", "running", "progress", "label"],
+      "maxCalls": 4,
+      "maxStatusCalls": 30,
+      "windowMs": 10000,
+      "askTimeoutMs": 120000,
+      "afterGraceMs": 10000,
+      "maxInputsBytes": 65536,
+      "states": ["SETTING_UP", "READY"],
+      "errorCodes": ["not_installed", "no_setup", "bad_request", "refused", "permission_denied", "busy", "rate_limited", "timeout"]
     },
     "errorCodes": [
       "provider_missing",

@@ -602,6 +602,73 @@ The guide: <https://kinotvapp.github.io/kino-plugins/en/vault/>, <https://kinotv
   el botón «mándame a buscar») y no necesita capacidad. Un Kino anterior que no la conoce descarta todo el go (la pantalla queda
   como está).
 
+## apiVersion 29 and 30 (Kino 0.9.91) / apiVersion 29 y 30 (Kino 0.9.91)
+
+- **apiVersion 29, `go: { relinkTelegram: true }`:** opens Kino's own «Reautenticar Telegram» screen, where the person
+  re-validates this device with their Telegram account — the fix to offer when `kino.identity.telegram` answered
+  `not_available`. It carries nothing and signs no one in, so pair it with your own "Reintentar". Only for a plugin that declares
+  `identity` (any other's is dropped, logged `not_identity`), only from the person's own press or submit. Below apiVersion 29 the
+  whole go is dropped: show the button only when `kino.pluginApiVersion >= 29` (keep a lower base and opt in with
+  `"enhancements": { "29": {} }`) and keep a written instruction beside it for an older Kino.
+- **apiVersion 30, the manifest's `setup` block:** a plugin that needs a one-time job before it is useful (downloading a
+  catalog, say) declares `"setup": { "route"?, "inputs"? }` (at apiVersion 30, or inside `enhancements["30"]`). `route` (needs
+  the `screen` capability) is the screen that shows the setup; without it Kino shows its own setup sheet. `inputs` whitelists
+  your OWN `select`, `toggle` or `text` settings (never a `password`) that another plugin may set, with the setting's own type
+  and, for a select, a subset of its options. Declaring `setup` requires the exports `setupStatus()` (`{ ready, label?,
+  progress? }`, cheap, 10 s) and `setupRun({ inputs?, step })` (one bounded chunk, 20 s, `{ done, progress?, label? }`; Kino
+  calls it with step 0, 1, 2… until `done`); keep your progress in `kino.storage`. `validate` checks the block and the exports;
+  an enhancement whose exports are missing is dropped, not refused.
+- **apiVersion 30, `kino.plugins.setup(repo, inputs?)` and `kino.plugins.setupStatus(repo)`:** one plugin asks Kino to set up
+  another installed plugin (by its plain `owner/name`), limited to the inputs that one declares, after the person's OK in
+  Kino's own dialog; `setup` resolves `{ state: "SETTING_UP" }` (or `{ state: "READY" }`) at once and `setupStatus` answers
+  `{ ready, running, progress?, label? }` from what Kino last heard (`!ready && !running`: it stopped without finishing). No
+  `consumes` entry and no capability. `setup` only from a call the person started (`screen`, `screenEvent`, `panelAction`),
+  never a timer's tick, a background job or your own `setupRun`; 4 `setup` and 30 `setupStatus` calls in any 10 s; the
+  person's 120 s to answer never come out of your call's own time. Codes: `not_installed`, `no_setup`, `bad_request`,
+  `refused`, `permission_denied`, `busy`, `rate_limited`, `timeout`. Feature-detect with
+  `typeof kino.plugins.setup === "function"`. The kit installs no other plugin: it checks the arguments as the app does
+  (`bad_request`) and then answers `not_installed`, and refuses both calls inside `sign()` and a scheduled job.
+- **`kino.nuvio`'s `removed` (additive, no apiVersion):** a scraper the person deleted in Plugins ▸ De terceros (one by one,
+  or the whole repository with Borrar todo) and has not installed again comes in `available()` with `removed: true`, and
+  `use()` lists it in `failed` with code `removed`: Kino never reinstalls it for a plugin, so drop it from what you offer. An
+  older Kino never sends either. In the kit's nuvio fixture put `removed: true` on an `available` entry, or on the repository
+  for all of them.
+
+The guide: <https://kinotvapp.github.io/kino-plugins/en/identity/>, <https://kinotvapp.github.io/kino-plugins/en/screen-components/>,
+<https://kinotvapp.github.io/kino-plugins/en/nuvio-plugins/>.
+
+- **apiVersion 29, `go: { relinkTelegram: true }`:** abre la pantalla «Reautenticar Telegram» de Kino, donde la persona
+  vuelve a validar este aparato con su cuenta de Telegram —el arreglo a ofrecer cuando `kino.identity.telegram` respondió
+  `not_available`—. No lleva nada y no inicia sesión a nadie, así que acompáñalo con tu propio «Reintentar». Solo para un
+  plugin que declara `identity` (el de cualquier otro se descarta, registrado `not_identity`), solo desde la pulsación o el
+  envío de la propia persona. Por debajo de apiVersion 29 se descarta todo el go: muestra el botón solo cuando
+  `kino.pluginApiVersion >= 29` (mantén una base más baja y actívalo con `"enhancements": { "29": {} }`) y deja una
+  instrucción escrita al lado para un Kino anterior.
+- **apiVersion 30, el bloque `setup` del manifiesto:** un plugin que necesita un trabajo único antes de servir (descargar un
+  catálogo, por ejemplo) declara `"setup": { "route"?, "inputs"? }` (en apiVersion 30, o dentro de `enhancements["30"]`).
+  `route` (necesita la capacidad `screen`) es la pantalla que muestra la configuración; sin ella Kino muestra su propia hoja.
+  `inputs` lista tus PROPIOS ajustes `select`, `toggle` o `text` (nunca un `password`) que otro plugin puede fijar, con el
+  tipo del propio ajuste y, para un select, un subconjunto de sus opciones. Declarar `setup` exige los exports
+  `setupStatus()` (`{ ready, label?, progress? }`, barato, 10 s) y `setupRun({ inputs?, step })` (un tramo acotado, 20 s,
+  `{ done, progress?, label? }`; Kino lo llama con step 0, 1, 2… hasta `done`); guarda tu avance en `kino.storage`.
+  `validate` revisa el bloque y los exports; una mejora (enhancement) a la que le faltan los exports se descarta, no se rechaza.
+- **apiVersion 30, `kino.plugins.setup(repo, inputs?)` y `kino.plugins.setupStatus(repo)`:** un plugin le pide a Kino que
+  configure otro plugin instalado (por su `owner/name` simple), limitado a los inputs que ese declara, tras el visto bueno de
+  la persona en un diálogo de Kino; `setup` resuelve `{ state: "SETTING_UP" }` (o `{ state: "READY" }`) enseguida y
+  `setupStatus` responde `{ ready, running, progress?, label? }` con lo último que Kino supo (`!ready && !running`: se detuvo
+  sin terminar). Sin entrada en `consumes` y sin capacidad. `setup` solo desde una llamada que inició la persona (`screen`,
+  `screenEvent`, `panelAction`), nunca un tick de temporizador, un trabajo en segundo plano ni tu propio `setupRun`; 4
+  llamadas a `setup` y 30 a `setupStatus` en cualquier ventana de 10 s; los 120 s que tiene la persona para responder nunca
+  salen del tiempo de tu propia llamada. Códigos: `not_installed`, `no_setup`, `bad_request`, `refused`,
+  `permission_denied`, `busy`, `rate_limited`, `timeout`. Detéctalo con `typeof kino.plugins.setup === "function"`. El kit no
+  instala ningún otro plugin: revisa los argumentos como la app (`bad_request`) y luego responde `not_installed`, y rechaza
+  ambas llamadas dentro de `sign()` y de un trabajo programado.
+- **`removed` de `kino.nuvio` (aditivo, sin apiVersion nuevo):** un scraper que la persona borró en Plugins ▸ De terceros
+  (uno a uno, o todo el repositorio con Borrar todo) y no volvió a instalar llega en `available()` con `removed: true`, y
+  `use()` lo pone en `failed` con el código `removed`: Kino nunca lo reinstala para un plugin, así que quítalo de lo que
+  ofreces. Un Kino anterior no envía ninguno de los dos. En la fixture de nuvio del kit pon `removed: true` en una entrada de
+  `available`, o en el repositorio para todos.
+
 ## Tests
 
 ```

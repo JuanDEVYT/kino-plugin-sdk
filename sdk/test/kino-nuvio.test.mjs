@@ -135,6 +135,19 @@ test("available lists what the repository offers; use installs the compatible on
   assert.equal((await kino.nuvio.available({ repo: REPO })).find((o) => o.id === "alpha").installed, true);
 });
 
+test("a scraper the person removed: available marks it removed and use fails it with code removed (fixture removed: true)", async () => {
+  const repo = FIXTURE["owner/nuvio-repository"];
+  const one = kinoWith(MANIFEST, { nuvioFixture: { "owner/nuvio-repository": { ...repo, available: repo.available.map((o) => (o.id === "beta" ? { ...o, removed: true } : o)) } } });
+  const offered = await one.nuvio.available({ repo: REPO });
+  assert.deepEqual(offered.map((o) => [o.id, o.removed]), [["alpha", undefined], ["beta", true], ["gamma", undefined]]);
+  const used = await one.nuvio.use({ repo: REPO, scrapers: ["alpha", "beta"] });
+  assert.deepEqual(used.ready, ["alpha"]);
+  assert.deepEqual(used.failed.map((f) => [f.id, f.code]), [["beta", "removed"]]);
+  const whole = kinoWith(MANIFEST, { nuvioFixture: { "owner/nuvio-repository": { ...repo, removed: true } } });
+  assert.ok((await whole.nuvio.available({ repo: REPO })).every((o) => o.removed === true));
+  assert.deepEqual((await whole.nuvio.use({ repo: REPO, scrapers: ["alpha", "nope"] })).failed.map((f) => f.code), ["removed", "removed"]);
+});
+
 test("streams: one entry per installed scraper; a missing, failing or slow scraper is an entry, never a throw", async () => {
   const kino = kinoWith();
   await kino.nuvio.use({ repo: REPO, scrapers: ["alpha", "beta"] });

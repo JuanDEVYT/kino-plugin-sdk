@@ -70,7 +70,7 @@ export function requiredExports(caps, settings = [], manifest = {}) {
     ...(settings.some((s) => s && (s.type === "status" || s.type === "qr")) ? [ui.status] : []),
     ...(settings.some((s) => s && s.type === "action") ? [ui.action] : []),
   ];
-  return [...new Set([...caps.flatMap((c) => contract.capabilities.exports[c] || (contract.capabilities.declarative.includes(c) ? [] : [c])), ...fromSettings, ...(manifest.section ? [contract.manifest.section.export] : []), ...(manifest.panel ? [contract.manifest.panel.exports.panel] : []), ...(manifest.pluginStore?.mode === "live" ? contract.kinoStore.liveExports : []), ...((manifest.screen?.replaces || []).includes("categories") ? [contract.output.categories.export] : [])])];
+  return [...new Set([...caps.flatMap((c) => contract.capabilities.exports[c] || (contract.capabilities.declarative.includes(c) ? [] : [c])), ...fromSettings, ...(manifest.section ? [contract.manifest.section.export] : []), ...(manifest.panel ? [contract.manifest.panel.exports.panel] : []), ...(manifest.setup ? Object.values(contract.manifest.setup.exports) : []), ...(manifest.pluginStore?.mode === "live" ? contract.kinoStore.liveExports : []), ...((manifest.screen?.replaces || []).includes("categories") ? [contract.output.categories.export] : [])])];
 }
 
 /** PluginManifest.kt's refusals for the `screen` field (apiVersion 14). */
@@ -596,6 +596,7 @@ function enhance(json, key, block, current, opts, exports) {
   if (has(block, "visualBrowser")) candidate.visualBrowser = block.visualBrowser;
   if (has(block, "slot")) candidate.slot = block.slot;
   if (has(block, "openFrom")) candidate.openFrom = block.openFrom;
+  if (has(block, "setup")) candidate.setup = block.setup;
   candidate.apiVersion = key;
   const r = validateManifestObject(candidate, opts);
   if (!r.ok) return `${r.field}: ${r.message}`;
@@ -625,6 +626,7 @@ function enhance(json, key, block, current, opts, exports) {
     visualBrowser: has(block, "visualBrowser") ? r.manifest.visualBrowser : current.visualBrowser,
     slot: has(block, "slot") ? r.manifest.slot : current.slot,
     openFromRoutes: has(block, "openFrom") ? r.manifest.openFromRoutes : current.openFromRoutes,
+    setup: has(block, "setup") ? r.manifest.setup : current.setup,
     enhancementsApplied: [...current.enhancementsApplied, key],
   };
   // Task 18 (G13): the apiVersion the settings list was read at (the block's key when it carried one); kept out of the manifest's
@@ -1016,6 +1018,41 @@ function validateManifestObject(o, { knownPermissions = contract.permissions } =
     if (!list.every((r) => typeof r === "string" && GO_ROUTE.test(r)) || new Set(list).size !== list.length) return bad("openFrom", P.badRoutesMessage);
     openFromRoutes = [...list];
   }
+  // apiVersion 30 (PluginManifest.kt setup): a setup step Kino can run and show; the route is one of this plugin's own screens
+  // (needs the capability) and inputs a whitelist over its OWN select, toggle or text settings (PluginSetupDecl).
+  let setup = null;
+  if (o.setup !== undefined) {
+    const P = m.setup;
+    if (o.apiVersion < P.apiVersion) return bad("setup", P.needsApiMessage);
+    if (o.setup === null || typeof o.setup !== "object" || Array.isArray(o.setup)) return bad("setup", P.notObjectMessage);
+    let route = null;
+    if (has(o.setup, "route")) {
+      if (!caps.includes("screen")) return bad("setup", P.needsScreenMessage);
+      if (typeof o.setup.route !== "string" || !GO_ROUTE.test(o.setup.route)) return bad("setup", P.badRouteMessage);
+      route = o.setup.route;
+    }
+    const inputs = {};
+    if (has(o.setup, "inputs")) {
+      const map = o.setup.inputs;
+      if (map === null || typeof map !== "object" || Array.isArray(map)) return bad("setup", P.badInputsMessage);
+      for (const key of Object.keys(map)) {
+        const decl = map[key];
+        if (decl === null || typeof decl !== "object" || Array.isArray(decl)) return bad("setup", P.badInputsMessage);
+        const own = (Array.isArray(o.settings) ? o.settings : []).find((x) => x && x.key === key);
+        if (!own || !P.inputTypes.includes(own.type) || decl.type !== own.type) return bad("setup", P.badInputsMessage);
+        let options = [];
+        if (own.type === "select") {
+          const list = decl.options;
+          if (!Array.isArray(list) || list.length < 1 || !list.every((v) => typeof v === "string") || new Set(list).size !== list.length) return bad("setup", P.badInputsMessage);
+          const known = (Array.isArray(own.options) ? own.options : []).map((x) => x && x.value);
+          if (!list.every((v) => known.includes(v))) return bad("setup", P.badInputsMessage);
+          options = [...list];
+        } else if (has(decl, "options")) return bad("setup", P.badInputsMessage);
+        inputs[key] = { key, type: own.type, options };
+      }
+    }
+    setup = { route, inputs };
+  }
   // apiVersion 9: where the settings go (rows, columns, cards). A list here; validate.mjs and panel.mjs judge the rest.
   if (o.settingsLayout !== undefined && o.apiVersion >= m.settingsLayout.apiVersion && !Array.isArray(o.settingsLayout)) return bad("settingsLayout", 'The "settingsLayout" field must be a list');
   // apiVersion 6: the palette. Format only; the guardrails run where it is used.
@@ -1128,7 +1165,7 @@ function validateManifestObject(o, { knownPermissions = contract.permissions } =
   // "resolveAhead" (additive: valid at every apiVersion), read last as the app reads it: a hint, so what it drops never refuses
   // the plugin (validate.mjs warns). Judged beside catalogOnly and browser as the app honours them.
   const resolveAhead = resolveAheadOf(o.resolveAhead, catalogOnly, browser).value;
-  const out = { ...o, hosts: [...new Set(hosts)], capabilities: caps, permissions: o.permissions || [], settings: settingsOut, insecureHosts, liveStreamHostsAny, streamHostsAny, fetchHostsAny, discoverable, categories, debug, telemetry, browser, browserPages, visualBrowser, section, panel, screen, slot, theme, appThemes, secrets, secretKeyEncodings, catalogOnly, openFromRoutes, resolveAhead };
+  const out = { ...o, hosts: [...new Set(hosts)], capabilities: caps, permissions: o.permissions || [], settings: settingsOut, insecureHosts, liveStreamHostsAny, streamHostsAny, fetchHostsAny, discoverable, categories, debug, telemetry, browser, browserPages, visualBrowser, section, panel, screen, slot, theme, appThemes, secrets, secretKeyEncodings, catalogOnly, openFromRoutes, setup, resolveAhead };
   // The parsed `recommends` (deduplicated, as written); none when it declares none.
   if (recommends.length) out.recommends = recommends; else delete out.recommends;
   // Task 8q: the parsed jobs (labels scrubbed, options sorted); none below apiVersion 14 or without `schedule`.
